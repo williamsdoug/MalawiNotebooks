@@ -13,7 +13,7 @@ from libUC import compressSig, findUC, normalizeUC
 from libTocopatchSignal import ProcessUC, isolateUC, UC_DEFAULT_PARAMS
 from libTocopatchSignal import butter_bandpass_filter, butter_lowpass_filter
 from libTocopatchSignal import clipExtremeAC, clipMinDC
-from libFilterUC import filterArtfactsUC, PARAMS_FILTER_UC
+from libFilterUC import filterArtfactsUC, removeSpikes, PARAMS_FILTER_UC
 
 
 
@@ -54,7 +54,10 @@ def showAnnotatedPlot(posMin, uc, filtered, allUC,
 
 def showAllContractions(selectedRecordings, path,
                         squelchFactor=3, squelchPercentile=50,
-                        minThresh=5, **kwargs):
+                        minThresh=5,
+                        useAltExtractor=False,
+                        altParams={'pct':40, 'width':25, 'freq':1.0/50},
+                        **kwargs):
 
     print 'kwargs:', kwargs
     
@@ -109,6 +112,10 @@ def showAllContractions(selectedRecordings, path,
             filtered, uc, alt_uc = isolateUC(raw, fs,
                                              **UC_DEFAULT_PARAMS)
 
+            if useAltExtractor:
+                uc_orig = uc
+                uc = removeSpikes(filtered, **altParams)
+
             thresh = np.percentile(np.abs(filtered), 95)*2
             filtered = np.abs(filtered)
             filtered[filtered > thresh] = thresh
@@ -152,6 +159,13 @@ def showAllContractions(selectedRecordings, path,
             showAnnotatedPlot(posMin, uc, filtered, _allUC, 
                               base, squelchMag, sustainedUC=sustainedUC,
                               title='After')
+
+
+            if useAltExtractor:
+                noUC = []
+                showAnnotatedPlot(posMin, uc_orig, filtered, noUC,
+                                  base, squelchMag, sustainedUC=sustainedUC,
+                                  title='Reference - Current extractor')
 
             print
             print '*'*40
