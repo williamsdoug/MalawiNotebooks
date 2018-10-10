@@ -402,15 +402,17 @@ def displayCommon(extractorResults, mask, ts, uc=np.array([]), filtUC=np.array([
         plt.plot(ts, smoothHR, 'b')
         if showAltBaselines:
             if len(fastBaseline) > 0:
-                plt.plot(ts, fastBaseline, 'k--')  # 'm'
+                plt.plot(ts, fastBaseline, 'k--')
             if len(fastBaseline) > 0:
-                plt.plot(ts, medBaseline, 'r--')   # 'm'
+                plt.plot(ts, medBaseline, 'r--')
+                plt.plot(ts, medBaseline+15, 'g--')
+                plt.plot(ts, medBaseline-15, 'g--')
             if len(fastBaseline) > 0:
                 plt.plot(ts, slowBaseline, 'm--')
         else:
             plt.plot(ts, baseline, 'k--')  # 'm'
             plt.plot(ts, baseline - 15, 'r--')
-        plotAddDecelAnnotations(allDecels, 70, colorMap=colorMap, ignore=ignoreArtifacts)
+        plotAddDecelAnnotations(allDecels, 190, colorMap=colorMap, ignore=ignoreArtifacts)
         plotAddTimescaleGuides(70, 200, ts[-1])
         plt.xlim(tStart, tEnd)
         plt.show()
